@@ -1,38 +1,43 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Cart } from 'src/app/model/cart-payment/cart';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { Cart } from "src/app/model/cart-payment/cart";
+import { environment } from "src/environments/environment";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class CartService {
-  private url = "http://localhost:3000/cart";
+  private readonly base = environment.apiBase;
+  private readonly url = `${this.base}/cart`;
+
   carts: Cart[] = [];
 
-  constructor(
-    private httpClient: HttpClient
-  ) { }
+  constructor(private httpClient: HttpClient) {}
 
-  addToCart(cart): Observable<Cart> {
-    return this.httpClient.post<Cart>(this.url, cart)
+  addToCart(cart: Partial<Cart>): Observable<Cart> {
+    return this.httpClient.post<Cart>(this.url, cart);
   }
 
   Getall(): Observable<Cart[]> {
-    return this.httpClient.get<Cart[]>(this.url)
+    return this.httpClient.get<Cart[]>(this.url);
   }
 
-
-  findByIdid(id): Observable<Cart> {
-    return this.httpClient.get<Cart>(this.url + '/' + id);
+  findByIdid(id: string | number): Observable<Cart> {
+    return this.httpClient.get<Cart>(`${this.url}/${id}`);
   }
 
-  updateCart(id: any, cart: any) {
-    return this.httpClient.put(this.url + '/' + id, cart);
+  updateCart(id: string | number, cart: Partial<Cart>): Observable<Cart> {
+    return this.httpClient.put<Cart>(`${this.url}/${id}`, cart);
   }
 
-  DeleteCart(id): Observable<Cart> {
-    return this.httpClient.delete<Cart>(this.url + '/' + id);
+  DeleteCart(id: string | number): Observable<Cart> {
+    return this.httpClient.delete<Cart>(`${this.url}/${id}`);
   }
 
+  // ví dụ nếu cần filter theo userId: /cart?userId=123
+  findByUser(userId: string | number): Observable<Cart[]> {
+    const params = new HttpParams().set("userId", String(userId));
+    return this.httpClient.get<Cart[]>(this.url, { params });
+  }
 }

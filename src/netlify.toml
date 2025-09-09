@@ -5,7 +5,15 @@
 [build.environment]
   NODE_VERSION = "14"
 
+# SPA: tránh 404 khi F5 route sâu
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# PROXY API: /api/* -> API public thật (https)
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-public-api.example.com/:splat"
+  status = 200
+  force = true

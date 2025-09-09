@@ -3,64 +3,65 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Role } from 'src/app/model/user/role';
 import { User } from 'src/app/model/user/user';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthService {
+  apiurl = "http://localhost:3000/user";
+  private base = environment.apiBase;
 
-  apiurl = 'http://localhost:3000/user';
+  constructor(private http: HttpClient) {}
 
+  private url(path: string) {
+    return `${this.base}${path.startsWith("/") ? "" : "/"}${path}`;
+  }
 
-  constructor(private http: HttpClient) { }
-
-  RegisterUser(user): Observable<User> {
-    return this.http.post(this.apiurl, user)
+  RegisterUser(user: Partial<User>): Observable<User> {
+    return this.http.post<User>(this.url("/user"), user);
   }
 
   Getall(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiurl);
+    return this.http.get<User[]>(this.url("/user"));
   }
 
-  GetUserbyCode(id: any) {
-    return this.http.get(this.apiurl + '/' + id);
+  GetUserbyCode(id: string | number): Observable<User> {
+    return this.http.get<User>(this.url(`/user/${id}`));
   }
 
   getuserrole(): Observable<Role[]> {
-    return this.http.get<Role[]>('http://localhost:3000/role');
+    return this.http.get<Role[]>(this.url("/role"));
   }
 
-  GetIdRole(id) {
-    return this.http.get(this.apiurl + '/' + id);
+  GetIdRole(id: string | number): Observable<User> {
+    // (dường như trùng với GetUserbyCode – giữ nguyên tên để không phá callsite)
+    return this.http.get<User>(this.url(`/user/${id}`));
   }
 
-  GetAllCustomer() {
-    return this.http.get('http://localhost:3000/customer');
+  GetAllCustomer(): Observable<any> {
+    return this.http.get<any>(this.url("/customer"));
   }
 
-  updateuser(id: any, inputdata: any) {
-    return this.http.put(this.apiurl + '/' + id, inputdata);
+  updateuser(id: string | number, inputdata: Partial<User>): Observable<User> {
+    return this.http.put<User>(this.url(`/user/${id}`), inputdata);
   }
 
-  Getaccessbyrole(role: any, menu: any) {
-    return this.http.get('http://localhost:3000/roleaccess?role=' + role + '&menu=' + menu)
+
+  isloggedin(): boolean {
+    return sessionStorage.getItem("username") != null;
   }
 
-  isloggedin() {
-    return sessionStorage.getItem('username') != null;
-  }
-
-  getrole() {
-    return sessionStorage.getItem('role') != null ? sessionStorage.getItem('role')?.toString() : '';
+  getrole(): string {
+    return sessionStorage.getItem("role")?.toString() ?? "";
   }
 
   changePassword(userId: string, newPassword: string): Observable<any> {
-    const url = `${this.apiurl}/${userId}`;
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-    });
-    const body = { password: newPassword };
-
-    return this.http.put(url, body, { headers });
+    const headers = new HttpHeaders({ "Content-Type": "application/json" });
+    return this.http.put(
+      this.url(`/user/${userId}`),
+      { password: newPassword },
+      { headers }
+    );
   }
 }

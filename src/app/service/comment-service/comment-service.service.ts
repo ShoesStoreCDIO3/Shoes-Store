@@ -1,31 +1,39 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+// src/app/services/comment.service.ts
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+// Tránh đụng với DOM.Comment
+import { Comment as AppComment } from "src/app/model/comment/comment";
+import { environment } from "src/environments/environment";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: "root" })
 export class CommentService {
-  private https = 'http://localhost:3000/comment';
+  private readonly base = environment.apiBase;
+  private readonly url = `${this.base}/comment`;
 
-  constructor(
-    private httpClient: HttpClient,
-  ) { }
+  constructor(private httpClient: HttpClient) {}
 
-  GetAll(): Observable<Comment[]> {
-    return this.httpClient.get<Comment[]>(this.https)
+  GetAll(): Observable<AppComment[]> {
+    return this.httpClient.get<AppComment[]>(this.url);
   }
 
-  AddNewComment(comments): Observable<Comment> {
-    return this.httpClient.post<Comment>(this.https, comments)
+  AddNewComment(comments: Partial<AppComment>): Observable<AppComment> {
+    return this.httpClient.post<AppComment>(this.url, comments);
   }
 
-  FindById(idProduct): Observable<any> {
-    return this.httpClient.get<any>(this.https + '/' + idProduct)
+  // Nếu thực sự là lấy 1 comment theo ID:
+  FindById(id: string | number): Observable<AppComment> {
+    return this.httpClient.get<AppComment>(`${this.url}/${id}`);
   }
 
-  DeleteCmt(id): Observable<Comment> {
-    return this.httpClient.delete<Comment>(this.https + '/' + id)
+  // Nếu bạn muốn lấy COMMENT THEO SẢN PHẨM (json-server thường filter bằng query):
+  // GET /comment?productId=123
+  FindByProduct(productId: string | number): Observable<AppComment[]> {
+    const params = new HttpParams().set("productId", String(productId));
+    return this.httpClient.get<AppComment[]>(this.url, { params });
   }
 
+  DeleteCmt(id: string | number): Observable<AppComment> {
+    return this.httpClient.delete<AppComment>(`${this.url}/${id}`);
+  }
 }
