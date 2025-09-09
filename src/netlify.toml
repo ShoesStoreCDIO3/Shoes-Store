@@ -1,0 +1,11 @@
+[build]
+  command = "npm ci && npx @angular/cli@9.1.15 build --prod"
+  publish = "dist/shoes-store"
+
+[build.environment]
+  NODE_VERSION = "14"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
