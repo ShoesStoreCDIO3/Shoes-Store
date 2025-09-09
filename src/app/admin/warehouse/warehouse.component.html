@@ -1,0 +1,50 @@
+<app-navigation></app-navigation>
+
+<div class="insert-layer d-flex align-items-center">
+    <a routerLink="/home/{{userId}}"><i class="fa-solid fa-angle-left"></i></a>
+    <div class="d-flex justify-content-lg-between align-content-center" style="width: 100%;">
+        <h2 style="margin-left: 100px;"><strong>Quản Lý Sản Phẩm</strong></h2>
+        <button class="btn">Thêm Sản Phẩm Mới</button>
+    </div>
+</div>
+
+<table>
+    <tr>
+        <th>STT</th>
+        <th>Tên</th>
+        <th>Ảnh</th>
+        <th>Giá tiền</th>
+        <th>Giảm giá</th>
+        <th>Mô tả</th>
+        <th>Quản lý</th>
+    </tr>
+    <tr *ngFor="let item of saleList | paginate : {itemsPerPage : 5,currentPage : p}, let i = index">
+        <td>{{i+1}}</td>
+        <td>{{item.nameSaleProduct}}</td>
+        <td>
+            <div class="d-flex">
+                <img [src]="item.imgSale" alt="" width="60" height="60" />
+                <img [src]="item.imgSub1" alt="" width="60" height="60">
+                <img [src]="item.imgSub2" alt="" width="60" height="60">
+                <img [src]="item.imgSub3" alt="" width="60" height="60">
+                <img [src]="item.imgSub4" alt="" width="60" height="60">
+            </div>
+        </td>
+        <td>{{item.cost | currency}}</td>
+        <td>{{item.percentSale}}%</td>
+        <td>{{item.describe}}</td>
+        <td>
+            <div class="d-flex">
+                <button *ngIf="item.role != 'admin'"  style="margin-right: 5px;" type="button" class="btn">
+                    <i class="fa-solid fa-pen" routerLink="/edit-product/{{item.id}}/{{userId}}"></i>
+                </button>
+                <button *ngIf="item.role != 'admin' " type="button" class="btn">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </td>
+    </tr>
+</table>
+<pagination-controls style="margin: 40px 0;" class="pagination justify-content-center" previousLabel="" nextLabel=""
+    ellipsisLabel="..." (pageChange)="p = $event">
+</pagination-controls>
